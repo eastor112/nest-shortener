@@ -6,18 +6,30 @@ import {
   Patch,
   Param,
   Delete,
+  Res,
 } from '@nestjs/common';
 import { UrlService } from './url.service';
 import { CreateUrlDto } from './dto/create-url.dto';
 import { UpdateUrlDto } from './dto/update-url.dto';
 
-@Controller('url')
+@Controller()
 export class UrlController {
   constructor(private readonly urlService: UrlService) {}
 
-  @Post()
+  @Post('shorten')
   create(@Body() createUrlDto: CreateUrlDto) {
     return this.urlService.create(createUrlDto);
+  }
+
+  @Get(':code')
+  async redirect(
+    @Res() res,
+    @Param('code')
+    code: string,
+  ) {
+    const longUrl = await this.urlService.redirect(code);
+
+    return res.redirect(longUrl);
   }
 
   @Get()
